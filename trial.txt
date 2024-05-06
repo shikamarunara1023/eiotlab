@@ -1,0 +1,90 @@
+void setup()
+{
+	pinMode(9,OUTPUT);
+}
+
+void loop()
+{
+	digitalWrite(9,HIGH);
+	delay(5000);
+	digitalWrite(9,LOW);
+	delay(5000);
+}
+--------------------------------------------------------
+void setup()
+{
+	serial.begin(9600);
+}
+
+void loop()
+{
+	int data=random(1,1000);
+	serial.println(data);
+	delay(2500);
+}
+
+bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered)
+------------------------------------------------------
+mkdir sensors                                                                                                                                                                                                                                             cd sensors                                                                                                                                                                                                                           python3 -m venv venv                                                                                                                                                                                                                           source venv/bin/activate                                                                                                                                                                                                                        pip3 install gpiozero                                                                                                                                                                                                                                 pip3 install RPi-GPIO                                                                                                                                                                                                                               pip3 install rpi-lgpio 
+python3 <filename>.py
+
+from gpiozero import DigitalInputDevice,Buzzer
+from signal import pause
+ir_sensor=DigitalInputDevice(3,pull_up=None,active_state=False)
+buzzer=Buzzer(5)
+
+def state_change():
+	if ir_sensor.value:
+		print(0)
+		buzzer.off()
+	else:
+		print(1)
+		buzzer.on()
+ir_sensor.when_activated=state_change()
+ir_sensor.when_deactivated=state_change()
+------------------------------------------------------
+LED BIT P1.0
+ORD 00H
+MAIN:
+	CLR LED
+	ACALL DELAY3
+	SETB LED
+	ACALL DELAY3
+	SJMP MAIN
+DELAY3:
+	MOV R5,45
+	D1:MOV R6,255
+	D2:MOV R7,255
+
+	DJNZ R7,$
+	DJNZ R6,D2
+	DJNZ R5,D1
+
+	RET
+END
+------------------------------------------------------
+import httplib, urllib
+import time
+key = ""
+
+def thermometer():
+    while True:
+        #Calculate CPU temperature of Raspberry Pi in Degrees C
+        temp = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1e3 # Get Raspberry Pi CPU temp
+        params = urllib.urlencode({'field1': temp, 'key':key }) 
+        headers = {"Content-typZZe": "application/x-www-form-urlencoded","Accept": "text/plain"}
+        conn = httplib.HTTPConnection("api.thingspeak.com:80")
+        try:
+            conn.request("POST", "/update", params, headers)
+            response = conn.getresponse()
+            print temp
+            print response.status, response.reason
+            data = response.read()
+            conn.close()
+        except:
+            print "connection failed"
+        break
+#sleep for desired amount of time
+if __name__ == "__main__":
+        while True:
+                thermometer()
